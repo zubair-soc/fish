@@ -102,10 +102,13 @@
     <h3>💰 Fish Sale</h3>
     <div class="row">
       <div><label>Fish Type</label><input id="fs-type" placeholder="e.g. Rohu"/></div>
-      <div><label>Weight (kg)</label><input id="fs-kg" type="number" placeholder="40"/></div>
+      <div><label>Qty</label><input id="fs-qty" type="number" placeholder="100"/></div>
     </div>
     <div class="row">
+      <div><label>Weight (kg)</label><input id="fs-kg" type="number" placeholder="40"/></div>
       <div><label>Price/kg (৳)</label><input id="fs-price" type="number" placeholder="200"/></div>
+    </div>
+    <div class="row">
       <div><label>Buyer</label><input id="fs-buyer" placeholder="Optional"/></div>
     </div>
     <div style="margin-bottom:8px"><label>Date</label><input id="fs-date" type="date"/></div>
@@ -291,13 +294,13 @@ async function logEntry(type) {
   if (type==="purchase") {
     const t=v("fp-type"),qty=v("fp-qty"),kg=v("fp-kg"),price=v("fp-price"),date=v("fp-date")||today();
     if (!t||!kg||!price) return alert("Fill required fields");
-    label=`${t} — ${kg}kg × ৳${price}/kg`;
+    label=`${t} — ${qty} fish, ${kg}kg × ৳${price}/kg`;
     amount=Number(kg)*Number(price);
     await ins("simple_entries",{ pond_id:activePond, type, label, amount, shared, date });
   } else if (type==="sale") {
-    const t=v("fs-type"),kg=v("fs-kg"),price=v("fs-price"),buyer=v("fs-buyer"),date=v("fs-date")||today();
+    const t=v("fs-type"),qty=v("fs-qty"),kg=v("fs-kg"),price=v("fs-price"),buyer=v("fs-buyer"),date=v("fs-date")||today();
     if (!t||!kg||!price) return alert("Fill required fields");
-    label=`${t} — ${kg}kg × ৳${price}/kg${buyer?" → "+buyer:""}`;
+    label=`${t} — ${qty?qty+" fish, ":""}${kg}kg × ৳${price}/kg${buyer?" → "+buyer:""}`;
     amount=Number(kg)*Number(price);
     await ins("simple_entries",{ pond_id:activePond, type, label, amount, shared, date });
   } else if (type==="expense") {
@@ -345,7 +348,7 @@ function v(id) { return document.getElementById(id)?.value?.trim(); }
 
 function clearForm(type) {
   if (type==="purchase") ["fp-type","fp-qty","fp-kg","fp-price","fp-date"].forEach(id=>document.getElementById(id).value="");
-  if (type==="sale") ["fs-type","fs-kg","fs-price","fs-buyer","fs-date"].forEach(id=>document.getElementById(id).value="");
+  if (type==="sale") ["fs-type","fs-qty","fs-kg","fs-price","fs-buyer","fs-date"].forEach(id=>document.getElementById(id).value="");
   if (type==="expense") { document.getElementById("exp-amount").value=""; document.getElementById("exp-notes").value=""; document.getElementById("exp-date").value=""; document.getElementById("exp-shared").checked=false; }
 }
 
