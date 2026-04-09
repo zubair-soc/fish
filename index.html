@@ -167,9 +167,8 @@
 const SUPABASE_URL = "https://hmvrgrmirkdcbmyyifjq.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhtdnJncm1pcmtkY2JteXlpZmpxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU3MDYyNzAsImV4cCI6MjA5MTI4MjI3MH0._Oq5Q2jkBT6XZyHBhc2zALIDa64ZCNuExHjWBY2vzPk";
 
-let lastDates = { purchase: today(), sale: today(), expense: today() };
+let ponds = [], entries = [];
 let activePond = null, activeHistPond = null;
-let lastDates = { purchase: today(), sale: today(), expense: today() };
 
 const h = (url, opts={}) => fetch(`${SUPABASE_URL}/rest/v1/${url}`, {
   headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, "Content-Type": "application/json", Prefer: opts.prefer||"return=representation" },
@@ -293,23 +292,20 @@ async function logEntry(type) {
   let label="", amount=0, shared=false;
 
   if (type==="purchase") {
-    const t=v("fp-type"),qty=v("fp-qty"),kg=v("fp-kg"),price=v("fp-price"),date=v("fp-date")||lastDates.purchase;
+    const t=v("fp-type"),qty=v("fp-qty"),kg=v("fp-kg"),price=v("fp-price"),date=v("fp-date")||today();
     if (!t||!kg||!price) return alert("Fill required fields");
-    lastDates.purchase = date;
     label=`${t} — ${qty} fish, ${kg}kg × ৳${price}/kg`;
     amount=Number(kg)*Number(price);
     await ins("simple_entries",{ pond_id:activePond, type, label, amount, shared, date });
   } else if (type==="sale") {
-    const t=v("fs-type"),qty=v("fs-qty"),kg=v("fs-kg"),price=v("fs-price"),buyer=v("fs-buyer"),date=v("fs-date")||lastDates.sale;
+    const t=v("fs-type"),qty=v("fs-qty"),kg=v("fs-kg"),price=v("fs-price"),buyer=v("fs-buyer"),date=v("fs-date")||today();
     if (!t||!kg||!price) return alert("Fill required fields");
-    lastDates.sale = date;
     label=`${t} — ${qty?qty+" fish, ":""}${kg}kg × ৳${price}/kg${buyer?" → "+buyer:""}`;
     amount=Number(kg)*Number(price);
     await ins("simple_entries",{ pond_id:activePond, type, label, amount, shared, date });
   } else if (type==="expense") {
-    const cat=v("exp-cat"),amt=v("exp-amount"),notes=v("exp-notes"),date=v("exp-date")||lastDates.expense;
+    const cat=v("exp-cat"),amt=v("exp-amount"),notes=v("exp-notes"),date=v("exp-date")||today();
     if (!amt) return alert("Enter amount");
-    lastDates.expense = date;
     label=`${cat}${notes?" — "+notes:""}`;
     amount=Number(amt);
     shared=document.getElementById("exp-shared").checked;
@@ -351,9 +347,9 @@ async function resetAll() {
 function v(id) { return document.getElementById(id)?.value?.trim(); }
 
 function clearForm(type) {
-  if (type==="purchase") { ["fp-type","fp-qty","fp-kg","fp-price"].forEach(id=>document.getElementById(id).value=""); document.getElementById("fp-date").value=lastDates.purchase; }
-  if (type==="sale") { ["fs-type","fs-qty","fs-kg","fs-price","fs-buyer"].forEach(id=>document.getElementById(id).value=""); document.getElementById("fs-date").value=lastDates.sale; }
-  if (type==="expense") { document.getElementById("exp-amount").value=""; document.getElementById("exp-notes").value=""; document.getElementById("exp-date").value=lastDates.expense; document.getElementById("exp-shared").checked=false; }
+  if (type==="purchase") ["fp-type","fp-qty","fp-kg","fp-price","fp-date"].forEach(id=>document.getElementById(id).value="");
+  if (type==="sale") ["fs-type","fs-qty","fs-kg","fs-price","fs-buyer","fs-date"].forEach(id=>document.getElementById(id).value="");
+  if (type==="expense") { document.getElementById("exp-amount").value=""; document.getElementById("exp-notes").value=""; document.getElementById("exp-date").value=""; document.getElementById("exp-shared").checked=false; }
 }
 
 function showTab(name) {
