@@ -303,7 +303,7 @@ async function logEntry(type) {
     if (!t||!kg||!price) return alert("Fill required fields");
     lastDates.purchase = date;
     label = `${t}${qty?" — "+qty+" fish":""}, ${kg}kg × ৳${price}/kg`;
-    amount = Number(kg) * Number(price);
+    amount = Number(qty) * Number(kg) * Number(price);
     ["fp-type","fp-qty","fp-kg","fp-price"].forEach(id=>document.getElementById(id).value="");
     document.getElementById("fp-date").value = lastDates.purchase;
   } else if (type==="sale") {
@@ -312,7 +312,7 @@ async function logEntry(type) {
     if (!t||!kg||!price) return alert("Fill required fields");
     lastDates.sale = date;
     label = `${t}${qty?" — "+qty+" fish":""}, ${kg}kg × ৳${price}/kg${buyer?" → "+buyer:""}`;
-    amount = Number(kg) * Number(price);
+    amount = Number(qty) * Number(kg) * Number(price);
     ["fs-type","fs-qty","fs-kg","fs-price","fs-buyer"].forEach(id=>document.getElementById(id).value="");
     document.getElementById("fs-date").value = lastDates.sale;
   } else if (type==="expense") {
