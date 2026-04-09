@@ -74,6 +74,7 @@
       <div class="stat"><div class="label">Costs</div><div class="value red" id="total-cost">৳0</div></div>
       <div class="stat"><div class="label">Profit</div><div class="value blue" id="total-profit">৳0</div></div>
     </div>
+    <div style="margin-top:12px;border-top:1px solid #f3f4f6;padding-top:10px" id="total-breakdown"></div>
   </div>
 </div>
 
@@ -263,6 +264,26 @@ function renderHome() {
   const tp = document.getElementById("total-profit");
   tp.textContent = fmt(all.profit);
   tp.className = "value " + (all.profit>=0?"green":"red");
+
+  // Cost breakdown
+  const cats = [
+    { label:"🐟 Fish Purchase", filter: e => e.type==="purchase" },
+    { label:"🌾 Feed",          filter: e => e.type==="expense" && e.label.startsWith("Feed") },
+    { label:"🏠 Rent",          filter: e => e.type==="expense" && e.label.startsWith("Rent") },
+    { label:"👷 Labor",         filter: e => e.type==="expense" && e.label.startsWith("Labor") },
+    { label:"💊 Medicine",      filter: e => e.type==="expense" && e.label.startsWith("Medicine") },
+    { label:"🔧 Equipment",     filter: e => e.type==="expense" && e.label.startsWith("Equipment") },
+    { label:"📦 Other",         filter: e => e.type==="expense" && e.label.startsWith("Other") },
+  ];
+  const sharedShare = 1 / Math.max(ponds.length, 1);
+  const breakdown = cats.map(c => {
+    const total = entries.filter(c.filter).reduce((s,e) => s + Number(e.amount) * (e.shared ? sharedShare * ponds.length : 1), 0);
+    if (!total) return "";
+    return `<div style="display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid #f3f4f6">
+      <span>${c.label}</span><span class="red" style="font-weight:600">${fmt(total)}</span>
+    </div>`;
+  }).join("");
+  document.getElementById("total-breakdown").innerHTML = breakdown || '<p style="font-size:12px;color:#9ca3af">No cost data yet.</p>';
 }
 
 function renderHistory() {
