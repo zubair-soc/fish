@@ -267,6 +267,7 @@ function renderHome() {
 
   // Cost breakdown
   const cats = [
+    { label:"💰 Fish Sales",    filter: e => e.type==="sale",      income: true },
     { label:"🐟 Fish Purchase", filter: e => e.type==="purchase" },
     { label:"🌾 Feed",          filter: e => e.type==="expense" && e.label.startsWith("Feed") },
     { label:"🏠 Rent",          filter: e => e.type==="expense" && e.label.startsWith("Rent") },
@@ -279,8 +280,10 @@ function renderHome() {
   const breakdown = cats.map(c => {
     const total = entries.filter(c.filter).reduce((s,e) => s + Number(e.amount) * (e.shared ? sharedShare * ponds.length : 1), 0);
     if (!total) return "";
+    const color = c.income ? "green" : "red";
+    const sign = c.income ? "+" : "-";
     return `<div style="display:flex;justify-content:space-between;font-size:13px;padding:5px 0;border-bottom:1px solid #f3f4f6">
-      <span>${c.label}</span><span class="red" style="font-weight:600">${fmt(total)}</span>
+      <span>${c.label}</span><span class="${color}" style="font-weight:600">${sign}${fmt(total)}</span>
     </div>`;
   }).join("");
   document.getElementById("total-breakdown").innerHTML = breakdown || '<p style="font-size:12px;color:#9ca3af">No cost data yet.</p>';
